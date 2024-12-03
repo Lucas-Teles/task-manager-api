@@ -1,30 +1,39 @@
 package io.lucasteles.taskmanager.task_manager_api.controller;
 
+import io.lucasteles.taskmanager.task_manager_api.controller.dto.UserDTO;
 import io.lucasteles.taskmanager.task_manager_api.model.entity.User;
 import io.lucasteles.taskmanager.task_manager_api.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-
-    @Autowired
-    private UserService service;
+    private final UserService service;
 
     public UserController(UserService service) {
         this.service = service;
     }
 
     @PostMapping
-    public ResponseEntity<User> createdUser(@RequestBody User user){
-        User createdUser = service.saveUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    public ResponseEntity<Void> createdUser(@RequestBody UserDTO user){
+        User userEntity = user.mappingToUser();
+        service.saveUser(userEntity);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(userEntity.getId())
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping
