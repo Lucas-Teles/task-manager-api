@@ -4,14 +4,15 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
@@ -25,10 +26,15 @@ public class User {
     @NotBlank(message = "Este campo não pode ser vazio")
     private String email;
 
-    @CreationTimestamp
-    @Column(name = "created_at")
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "update_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    private LocalDateTime dateUpdate;
 
     public User() {
     }
@@ -37,7 +43,10 @@ public class User {
         this.name = name;
         this.email = email;
     }
-    public Long getId(){return id;}
+
+    public Long getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -53,5 +62,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getDateUpdate() {
+        return dateUpdate;
     }
 }

@@ -24,8 +24,7 @@ public class UserService {
     }
 
     public Optional<User> getUserById(Long id){
-        Optional<User> userFound = repository.findById(id);
-        return userFound;
+        return repository.findById(id);
     }
 
     public User updateUser(Long id, User user) {
@@ -38,8 +37,18 @@ public class UserService {
         return repository.save(existingUser);
     }
 
-    public void deleteUser(Long id) {
-        User user = repository.findById(id).get();
+    public void deleteUser(User user) {
         repository.delete(user);
     }
+
+    public List<User> find(String name, String email){
+        if (name != null && email != null){
+            return repository.findByNameAndEmail(name, email);
+        }
+        if (name != null || email != null){
+            return repository.findByNameOrEmail(name, email);
+        }
+        return repository.findAll();
+    }
+
 }
